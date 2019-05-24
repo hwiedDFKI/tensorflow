@@ -1,4 +1,6 @@
-licenses(["notice"])  # Apache 2.0
+package(
+    licenses = ["notice"],  # Apache 2.0
+)
 
 load("//tensorflow:tensorflow.bzl", "tf_py_test")
 load("//tensorflow:tensorflow.bzl", "cuda_py_test")
@@ -595,6 +597,7 @@ tf_xla_py_test(
     tags = [
         "no_pip",
         "no_rocm",
+        "no_windows",
         "nomac",
     ],
     deps = [
@@ -641,5 +644,22 @@ py_library(
         "//tensorflow/core:protos_all_py",
         "//tensorflow/python:platform",
         "//tensorflow/python/eager:context",
+    ],
+)
+
+tf_py_test(
+    name = "remote_test",
+    size = "medium",
+    srcs = ["remote_test.py"],
+    additional_deps = [
+        ":context",
+        ":def_function",
+        ":test",
+        ":remote",
+        "//tensorflow/python:resource_variable_ops",
+    ],
+    tags = [
+        "no_oss",  # This test launches local server.
+        "optonly",  # times out
     ],
 )

@@ -56,6 +56,9 @@ namespace {
 
 using ::testing::IsEmpty;
 
+// TODO(b/129561206): Reenable this test on fuchsia builds once the needed gtest
+// library is ported.
+#if !GTEST_OS_FUCHSIA
 // Make an interpreter that has no tensors and no nodes
 TEST(BasicInterpreter, ZeroInterpreter) {
   testing::internal::CaptureStderr();
@@ -74,6 +77,7 @@ TEST(BasicInterpreter, ZeroInterpreter) {
   Interpreter interpreter2;
   EXPECT_THAT(testing::internal::GetCapturedStderr(), IsEmpty());
 }
+#endif
 
 // Test various error conditions.
 TEST(BasicInterpreter, InvokeInvalidModel) {
@@ -318,9 +322,9 @@ TEST(BasicInterpreter, CheckArenaAllocation) {
 
   std::vector<int> sizes{2048, 4096, 1023, 2047, 1021,
                          2047, 1023, 2046, 0,    2048};
-  for (int i = 0; i < sizes.size(); ++i) {
-    interpreter.SetTensorParametersReadWrite(i, kTfLiteUInt8, "", {sizes[i]},
-                                             quant);
+  for (size_t i = 0; i < sizes.size(); ++i) {
+    interpreter.SetTensorParametersReadWrite(static_cast<int>(i), kTfLiteUInt8,
+                                             "", {sizes[i]}, quant);
   }
   interpreter.SetInputs({0, 1});
   interpreter.SetOutputs({9, 4});
